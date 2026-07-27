@@ -58,7 +58,10 @@ export function renderAI(
     board[y][x] = color;
     view.place(x, y, color);
     // 玩家落子后进入 AI 回合(ai:thinking 会更新提示);AI 落子后轮到玩家
-    if (color !== player && !over) statusEl.textContent = "轮到你了";
+    if (color !== player && !over) {
+      busy = false;
+      statusEl.textContent = "轮到你了";
+    }
   });
 
   socket.on("ai:thinking", () => {
