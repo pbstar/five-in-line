@@ -9,7 +9,7 @@ const DIFF_LABEL: Record<Difficulty, string> = {
   hard: "困难",
 };
 
-/** 人机对决视图:玩家执黑先手,AI 执白;经 Socket 与后端 DeepSeek 对弈 */
+/** 人机对决视图：玩家执黑先手，AI 执白 */
 export function renderAI(
   root: HTMLElement,
   difficulty: Difficulty,
