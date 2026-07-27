@@ -1,0 +1,31 @@
+{
+  "name": "five-in-line",
+  "version": "0.1.0",
+  "private": true,
+  "description": "移动端五子棋 H5 小游戏:房间对战 + 人机对决",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n server,client -c blue,green \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "tsx watch src/server/index.ts",
+    "dev:client": "vite",
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "vite build",
+    "build:server": "tsc -p tsconfig.server.json",
+    "start": "node dist/server/index.js",
+    "typecheck": "tsc -p tsconfig.server.json --noEmit && tsc -p tsconfig.client.json --noEmit"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.5",
+    "concurrently": "^9.1.2",
+    "socket.io-client": "^4.8.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.7"
+  }
+}
