@@ -2,8 +2,13 @@ import { BoardView } from "../board.js";
 import { getSocket } from "../socket.js";
 import type { Stone } from "../../shared/types.js";
 
-/** 房间对战视图:大厅(创建/加入)+ 联机对局 */
-export function renderRoom(root: HTMLElement, onBack: () => void): void {
+/** 房间对战视图:大厅(创建/加入)+ 联机对局
+ * @param joinRoomId - 通过分享链接传入的房间号,自动触发加入 */
+export function renderRoom(
+  root: HTMLElement,
+  onBack: () => void,
+  joinRoomId?: string,
+): void {
   const socket = getSocket();
   let myColor: Stone | null = null;
   let myTurn = false;
@@ -82,19 +87,31 @@ export function renderRoom(root: HTMLElement, onBack: () => void): void {
     joinInput.value = joinInput.value.replace(/\D/g, "").slice(0, 4);
   });
 
+  // 通过分享链接传入房间号,自动触发加入
+  if (joinRoomId) {
+    socket.emit("room:join", { roomId: joinRoomId });
+  }
+
   // ---- Socket 事件 ----
   socket.on("room:created", ({ roomId: id }) => {
     roomId = id;
+    // 构造完整分享链接
+    const shareUrl = `${window.location.origin}${window.location.pathname}?room=${id}`;
     roomInfo.textContent = `房间号 ${id}`;
+    // 同步更新浏览器地址栏,方便用户从地址栏直接复制
+    const url = new URL(window.location.href);
+    url.searchParams.set("room", id);
+    window.history.replaceState(null, "", url.toString());
     enterGame();
-    statusEl.innerHTML = `房间号 <b class="room-code" id="room-code">${id}</b> · 点击复制,等待对手加入…`;
+    statusEl.innerHTML = `房间号 <b class="room-code" id="room-code">${id}</b> · <span class="share-hint">点击复制链接,发送给朋友即可加入</span>`;
     root.querySelector<HTMLElement>("#room-code")?.addEventListener("click", () => {
-      void navigator.clipboard?.writeText(id).then(() => {
+      const copyText = `来玩五子棋吧！房间号：${id}\n点击链接加入：${shareUrl}`;
+      void navigator.clipboard?.writeText(copyText).then(() => {
         const el = root.querySelector<HTMLElement>("#room-code");
         if (el) {
           const prev = el.textContent;
-          el.textContent = "已复制";
-          setTimeout(() => (el.textContent = prev), 1000);
+          el.textContent = "链接已复制!";
+          setTimeout(() => (el.textContent = prev), 1500);
         }
       });
     });
